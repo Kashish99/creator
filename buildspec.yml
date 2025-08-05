@@ -1,0 +1,27 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo Installing kubectl...
+      - KUBECTL_VERSION=$(curl -sL https://dl.k8s.io/release/stable.txt)
+      - curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+      - chmod +x kubectl
+      - mv kubectl /usr/local/bin/kubectl
+      - kubectl version --client
+
+  pre_build:
+    commands:
+      - echo "Configuring kubectl with EKS cluster..."
+      - aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster
+
+  build:
+    commands:
+      - echo "Deploying Data Processor and API Gateway to EKS..."
+      - kubectl apply -f data-processor-deployment.yaml
+      - kubectl apply -f data-processor-service.yaml
+      - kubectl apply -f api-gateway-deployment.yaml
+      - kubectl apply -f api-gateway-service.yaml
+      - kubectl apply -f alb-ingress.yaml
