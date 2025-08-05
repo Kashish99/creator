@@ -1,0 +1,22 @@
+piVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: 861276104732.dkr.ecr.us-east-1.amazonaws.com/api-gateway:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GRPC_DATA_PROCESSOR_URL
+              value: data-processor:3001
